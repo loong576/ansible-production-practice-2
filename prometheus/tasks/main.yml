@@ -1,0 +1,48 @@
+---
+# tasks file for prometheus
+# author: loong576
+
+- name: user search
+  shell: id {{ user_name }}
+  register: user_search
+  ignore_errors: true
+
+- name: user add 
+  user: 
+    name: "{{ user_name }}"
+    shell: "{{ user_bash }}"
+    password: "{{ user_password }}"
+  when: user_search.failed == true
+
+- name: file search
+  stat:
+    path: "{{ file_dest }}/{{ file_src }}"    
+  register: file_search
+
+- name: copy files
+  copy:
+    src: "{{ file_src }}"
+    dest: "{{ file_dest }}"
+    mode: 0755
+  when: file_search.stat.exists == false
+ 
+- name: process search
+  shell: "ps -ef|grep node_exporter |grep -v grep"
+  register: process
+  ignore_errors: true
+
+- name: install node_exporter
+  environment:
+    dest: "{{ file_dest }}"
+    src: "{{ file_src }}"
+    port: "{{ node_port }}"
+  script:
+    startup.sh
+  register: start
+  tags: start
+  when: process.failed  == true 
+
+- name: exec when startup
+  lineinfile:
+    dest: /etc/rc.local
+    line: nohup {{ file_dest }}/{{ file_src }} --web.listen-address=:{{ node_port }} >/dev/null & 

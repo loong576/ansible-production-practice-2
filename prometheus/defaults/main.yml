@@ -1,0 +1,10 @@
+---
+# defaults file for prometheus
+user_name: sysmonitor 
+user_bash: /bin/bash
+user_password: $6$bB7R8JF3U7L7s/3E$fKOQwpoZ7RESfMmX6uqts1gw4yeXniRNctI2JRBRS2/120EgrHCWS3DboiRhO5sN0CjoVxvtAKgeDVQRaPlc0/
+
+file_src: node_exporter
+file_dest: /home/sysmonitor
+
+node_port: 9100
